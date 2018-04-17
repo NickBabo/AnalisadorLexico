@@ -10,8 +10,6 @@
 #define __IDENTIFICADOR__ "identificador"
 
 
-
-
 typedef struct token {
     char* nome;
     char* valor;
@@ -56,8 +54,6 @@ int main(int argc, char *argv[]) {
             strcat(result, " ");
         }
 
-
-
     }
 
     writeFile(result, strlen(result));
@@ -99,6 +95,7 @@ q0:(*pos)++;
     else if(txt[*pos] == '(') goto q147;
     else if(txt[*pos] == ')') goto q148;
     else if(txt[*pos] == ',') goto q149;
+    else if(txt[*pos] == '"') goto q161;
     else if(txt[*pos] == 'e'){
 		goto q31; //Escreva, Entao, Enquanto
 	}
@@ -239,6 +236,7 @@ q18:(*pos)++;
 		strcpy(token.nome, "<operadorMatematico,divisao>");
 		return token;
 	}else if (txt[*pos] == '*') goto q154;
+	else if(txt[*pos] == '/') goto q157;
 	else if(isLetter(txt[*pos])) goto q29;
     else return token;
 q19:(*pos)++;
@@ -686,6 +684,7 @@ q91:(*pos)++;
     else return token;
 q92: (*pos)++;
 	if(txt[*pos] == 'r') goto q93;
+	else if(txt[*pos] == 's') goto q158;
 	else if(isLetter(txt[*pos])) goto q29;
     else if(txt[*pos] == ' ') goto q83;
 
@@ -1024,43 +1023,37 @@ q144:(*pos)++;
 	if(txt[*pos] == ' ') {
     	(*pos)++;
     	strcpy(token.nome, "<logico>");
-		token.valor = getValue(txt, *pos);
 		return token;
 	}
 q145: (*pos)++;
 	if(txt[*pos] == ' ') {
 		(*pos)++;
-		strcpy(token.nome, "<delimitador, doisPontos>");
-		token.valor = getValue(txt, *pos);
+		strcpy(token.nome, "<delimitador,doisPontos>");
 		return token;
 	}
 q146: (*pos)++;
 	if(txt[*pos] == ' ') {
 		(*pos)++;
-		strcpy(token.nome, "<delimitador, pontoVirgula>");
-		token.valor = getValue(txt, *pos);
+		strcpy(token.nome, "<delimitador,pontoVirgula>");
 		return token;
 	}
 
 q147: (*pos)++;
 	if(txt[*pos] == ' ') {
 		(*pos)++;
-		strcpy(token.nome, "<delimitador, PA>");
-		token.valor = getValue(txt, *pos);
+		strcpy(token.nome, "<delimitador,PA>");
 		return token;
 	}
 q148: (*pos)++;
 	if(txt[*pos] == ' ') {
 		(*pos)++;
-		strcpy(token.nome, "<delimitador, PF>");
-		token.valor = getValue(txt, *pos);
+		strcpy(token.nome, "<delimitador,PF>");
 		return token;
 	}
 q149: (*pos)++;
 	if(txt[*pos] == ' ') {
 		(*pos)++;
-		strcpy(token.nome, "<delimitador, virgula>");
-		token.valor = getValue(txt, *pos);
+		strcpy(token.nome, "<delimitador,virgula>");
 		return token;
 	}
 q150: (*pos)++;
@@ -1074,7 +1067,6 @@ q151: (*pos)++;
 		return token;
 	}
 q152:(*pos)++;
-	printf("Entrou no 152");
 	if(isNumber(txt[*pos])) goto q152;
 	else if(isLetter(txt[*pos])) goto q29;
     else if(txt[*pos] == ' ') goto q153;
@@ -1098,6 +1090,37 @@ q156:(*pos)++;
 		strcpy(token.nome, "");
 		return token;
 	}
+q157:(*pos)++;
+//	if(txt[*pos] == ' '){
+//		(*pos)++;
+//		strcpy(token.nome, " ");
+//		return token;
+//	}
+//	skip(txt[*pos]);
+q158: (*pos)++;
+	if(txt[*pos] == 's') goto q159;
+	else if(isLetter(txt[*pos])) goto q29;
+    else if(txt[*pos] == ' ') goto q83;
+q159: (*pos)++;
+	if(txt[*pos] == 'o') goto q160;
+	else if(isLetter(txt[*pos])) goto q29;
+    else if(txt[*pos] == ' ') goto q83;
+q160: (*pos)++;
+	if(txt[*pos] == ' '){
+		(*pos)++;
+		strcpy(token.nome, "<passo>");
+		return token;
+	}
+	else if(isLetter(txt[*pos])) goto q29;
+q161: (*pos)++;
+	if(txt[*pos] == '"') goto q162;
+	else goto q161;
+q162: (*pos)++;
+	if(txt[*pos] == ' '){
+		(*pos)++;
+		strcpy(token.nome, "<delimitador,string>");
+		return token;
+	}
 q29:(*pos)++;
     if(isLetter(txt[*pos])) goto q29;
     if( txt[*pos] == ' ') goto q83;
@@ -1108,7 +1131,6 @@ q83: (*pos)++;
 	strcpy(token.nome, "<identificador,");
 	strcat(token.nome,  c);
 	strcat(token.nome, ">");
-
    	return token;
 q165: (*pos)++;
 	if(txt[*pos] == ' ') {
@@ -1120,27 +1142,35 @@ q165: (*pos)++;
 	 
 }
 
+void skip(FILE *entrada){
+	fscanf(entrada, "%*[^\n]\n", NULL);
+}
+
 void readFile(char txt[]) {
     FILE *arquivo_entrada;
     arquivo_entrada = fopen("input.txt","r");
     char line[400];
-
+	
     if (arquivo_entrada) {
         while (fscanf(arquivo_entrada,"%s ", line) != EOF) {
-            strcat(line, " ");
-            strcat(txt,line);
+        	if(line[0] == '/' && line[1] == '/'){
+				fscanf(arquivo_entrada, "%*[^\n]\n", NULL);
+			} else {
+            	strcat(line, " ");
+            	strcat(txt,line);
+				
+			}
         }
         fclose(arquivo_entrada);
     }
 }
+
 
 int isNumber(char c) {
     if (c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9')
         return 1;
     return 0;
 }
-
-
 
 char* getValue(char txt[],int pos) {
 
@@ -1163,7 +1193,6 @@ char* getValue(char txt[],int pos) {
 
     }
 
-    printf("Palavra Lida: %s\n",valor);
     return valor;
 }
 
@@ -1174,12 +1203,10 @@ int isLetter(char c) {
     if ((a > 96 && a < 123) || (a > 64 && a < 91)) {
         return 1;
     }
-
     return 0;
 }
 
 void writeFile(char result[], int pos){
-	printf("test: %s\n",result);
     int i,j,k;
     j = 0;
     char aux[100];
@@ -1206,7 +1233,7 @@ void writeFile(char result[], int pos){
 int needValue(char aux[]){
     int c;
     c = atoi(aux);
-    printf("%d", c);
+//    printf("%d", c);
     if(  c == __NUMERO_POSITIVO__ || c == __NUMERO_NEGATIVO__ || c == __IDENTIFICADOR__) return  1;
     return 0;
 }
