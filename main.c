@@ -7,12 +7,11 @@
 #define __NUMERO_POSITIVO__ 202
 #define __NUMERO_NEGATIVO__ 203
 
-#define __MAXIMO_VARIAVEIS__ 1000
+#define __MAXIMO_VARIAVEIS__ 500
 #define __MAXIMO_TAMANHO_VARIAVEIS__ 30
 
 #define __IDENTIFICADOR__ "identificador"
 
-static int global_IdNumber = 1;
 static int global_variaveisCount = 0;
 
 static char global_variaveis[__MAXIMO_VARIAVEIS__][__MAXIMO_TAMANHO_VARIAVEIS__];
@@ -33,7 +32,7 @@ char* getValue(char txt[],int pos);
 TOKEN scanner(char txt[], int *pos);
 
 int main(int argc, char *argv[]) {
-    int pos, i, tamanho;
+    int pos, i, j, tamanho;
 
     tamanho = 8000;
     pos = 0;
@@ -43,6 +42,10 @@ int main(int argc, char *argv[]) {
     /* Inicializar o vetor. */
     for(i = 0; i < tamanho; i++) {
         txt[i] = '\0';
+    }
+    
+    for (j=0; j < __MAXIMO_VARIAVEIS__; j++) {
+        global_variaveis[j][0] = '\0';
     }
 
 
@@ -1241,6 +1244,7 @@ void writeFile(char result[], int pos){
 
 char* getIdNumber(char* word){
     char * idNumber = (char *) malloc (31 * sizeof(char));
+    int i;
     
     for (i = 0; i < __MAXIMO_VARIAVEIS__; i++) {
         if (i <= global_variaveisCount) {
