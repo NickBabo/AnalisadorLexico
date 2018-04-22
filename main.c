@@ -7,8 +7,15 @@
 #define __NUMERO_POSITIVO__ 202
 #define __NUMERO_NEGATIVO__ 203
 
+#define __MAXIMO_VARIAVEIS__ 1000
+#define __MAXIMO_TAMANHO_VARIAVEIS__ 30
+
 #define __IDENTIFICADOR__ "identificador"
 
+static int global_IdNumber = 1;
+static int global_variaveisCount = 0;
+
+static char global_variaveis[__MAXIMO_VARIAVEIS__][__MAXIMO_TAMANHO_VARIAVEIS__];
 
 typedef struct token {
     char* nome;
@@ -20,6 +27,7 @@ void writeFile(char result[], int pos);
 int needValue(char aux[]);
 int isNumber(char c);
 int isLetter(char c);
+int getIdNumber(char id[]);
 
 char* getValue(char txt[],int pos);
 TOKEN scanner(char txt[], int *pos);
@@ -1128,8 +1136,9 @@ q29:(*pos)++;
 q83: (*pos)++;
 	int new_str;
 	char* c = getValue(txt, *pos);
+    char* number = getIdNumber(*c);
 	strcpy(token.nome, "<identificador,");
-	strcat(token.nome,  c);
+	strcat(token.nome,  number);
 	strcat(token.nome, ">");
    	return token;
 q165: (*pos)++;
@@ -1228,6 +1237,31 @@ void writeFile(char result[], int pos){
     file = fopen("output2.txt", "w+");
     fprintf(file, result);
     fclose(file);
+}
+
+char* getIdNumber(char* word){
+    char * idNumber = (char *) malloc (31 * sizeof(char));
+    
+    for (i = 0; i < __MAXIMO_VARIAVEIS__; i++) {
+        if (i <= global_variaveisCount) {
+            if (strcmp(global_variaveis[i], word) == 0) {
+                //Variável já existente
+                sprintf(idNumber, "%d", i);
+                return idNumber;
+                
+                break;
+            }
+        } else {
+            //Nova variável
+            global_variaveisCount++;
+            strcpy(global_variaveis[i], word);
+            
+            sprintf(idNumber, "%d", i);
+            
+            return idNumber;
+            break;
+        }
+    }
 }
 
 int needValue(char aux[]){
